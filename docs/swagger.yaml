@@ -1,0 +1,377 @@
+basePath: /
+definitions:
+  handler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.inputRevenueReport:
+    properties:
+      month:
+        type: integer
+      year:
+        type: integer
+    type: object
+  handler.pathOutput:
+    properties:
+      file_path:
+        type: string
+    type: object
+  handler.statusResponse:
+    properties:
+      status:
+        type: string
+    type: object
+  handler.userHistory:
+    properties:
+      history:
+        items:
+          $ref: '#/definitions/models.HistoryRow'
+        type: array
+    type: object
+  models.HistoryRow:
+    properties:
+      accepted_date:
+        type: string
+      amount:
+        type: number
+      description:
+        type: string
+      id:
+        type: integer
+      order-id:
+        type: integer
+      product-id:
+        type: integer
+      user_from:
+        type: integer
+      user_to:
+        type: integer
+    type: object
+  models.InputUserReport:
+    properties:
+      order_by:
+        type: string
+      page:
+        type: integer
+      records_on_page:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  models.Purchase:
+    properties:
+      amount:
+        type: number
+      order_id:
+        type: integer
+      product_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
+  models.RefillBalance:
+    properties:
+      amount:
+        type: number
+      user_id:
+        type: integer
+    type: object
+  models.Transfer:
+    properties:
+      amount:
+        type: number
+      user_from:
+        type: integer
+      user_to:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      balance:
+        type: number
+      id:
+        type: integer
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: Microservice for working with user balance
+  title: AvitoTestTask
+  version: "1.0"
+paths:
+  /api/v1/purchase/accept:
+    post:
+      consumes:
+      - application/json
+      description: Revenue recognition method
+      parameters:
+      - description: purchase struct
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Purchase'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.statusResponse'
+        "400":
+          description: invalid request parameters
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "401":
+          description: the user with the given id does not exist
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "424":
+          description: reserved service not found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Accept purchase
+  /api/v1/purchase/cancel:
+    post:
+      consumes:
+      - application/json
+      description: Reservation Method
+      parameters:
+      - description: purchase struct
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Purchase'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.statusResponse'
+        "400":
+          description: invalid request parameters
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "401":
+          description: the user with the given id does not exist
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "424":
+          description: reserved service not found
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Cancel purchase
+  /api/v1/purchase/reserve:
+    post:
+      consumes:
+      - application/json
+      description: Method of reserving funds from the main balance in a separate account
+      parameters:
+      - description: purchase struct
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Purchase'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.statusResponse'
+        "400":
+          description: invalid request parameters
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "401":
+          description: the user with the given id does not exist
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "422":
+          description: not enough money to buy
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "424":
+          description: this service is already reserved
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Reserve purchase
+  /api/v1/reports/revenue:
+    get:
+      consumes:
+      - application/json
+      description: Monthly report receipt method
+      parameters:
+      - description: input revenue report struct
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/handler.inputRevenueReport'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.pathOutput'
+        "400":
+          description: invalid request parameters
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get revenue report
+  /api/v1/reports/user:
+    get:
+      consumes:
+      - application/json
+      description: Method for obtaining a list of transactions with comments from
+        where and why the funds were credited / debited from the balance
+      parameters:
+      - description: input user report struct
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.InputUserReport'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.userHistory'
+        "400":
+          description: invalid request parameters
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "401":
+          description: the user with the given id does not exist
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get user report
+  /api/v1/transfer:
+    post:
+      consumes:
+      - application/json
+      description: Method of transferring funds between users
+      parameters:
+      - description: transfer struct
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Transfer'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.statusResponse'
+        "400":
+          description: invalid request parameters
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "401":
+          description: the user with the given id does not exist
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "422":
+          description: insufficient funds to transfer
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Transfer
+  /api/v1/users/{id}:
+    get:
+      description: User balance receipt method
+      parameters:
+      - description: id of username
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: invalid request parameters
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "401":
+          description: the user with the given id does not exist
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Get user balance
+  /api/v1/users/refill:
+    post:
+      consumes:
+      - application/json
+      description: The method of accruing funds to the balance
+      parameters:
+      - description: refill balance struct
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.RefillBalance'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.statusResponse'
+        "400":
+          description: invalid request parameters
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "401":
+          description: the user with the given id does not exist
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "422":
+          description: invalid request data
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+        "500":
+          description: server error
+          schema:
+            $ref: '#/definitions/handler.errorResponse'
+      summary: Refill user balance
+swagger: "2.0"

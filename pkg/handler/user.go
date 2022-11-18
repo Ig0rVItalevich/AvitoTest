@@ -8,6 +8,16 @@ import (
 	"strconv"
 )
 
+// getUserBalance
+// @Summary Get user balance
+// @Description User balance receipt method
+// @Produce json
+// @Param id path int true "id of username"
+// @Success 200 {object} models.User "OK"
+// @Failure 400 {object} handler.errorResponse "invalid request parameters"
+// @Failure 401 {object} handler.errorResponse "the user with the given id does not exist"
+// @Failure 500 {object} handler.errorResponse "server error"
+// @Router /api/v1/users/{id} [GET]
 func (h *Handler) getUserBalance(ctx *gin.Context) {
 	id, err := strconv.ParseInt(ctx.Param("id"), 10, 64)
 	if err != nil || id <= 0 {
@@ -30,6 +40,18 @@ func (h *Handler) getUserBalance(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, user)
 }
 
+// refillUserBalance
+// @Summary Refill user balance
+// @Description The method of accruing funds to the balance
+// @Accept json
+// @Produce json
+// @Param input body models.RefillBalance true "refill balance struct"
+// @Success 200 {object} handler.statusResponse "OK"
+// @Failure 400 {object} handler.errorResponse "invalid request parameters"
+// @Failure 401 {object} handler.errorResponse "the user with the given id does not exist"
+// @Failure 422 {object} handler.errorResponse "invalid request data"
+// @Failure 500 {object} handler.errorResponse "server error"
+// @Router /api/v1/users/refill [POST]
 func (h *Handler) refillUserBalance(ctx *gin.Context) {
 	var input models.RefillBalance
 	if err := ctx.BindJSON(&input); err != nil {
@@ -59,6 +81,18 @@ func (h *Handler) refillUserBalance(ctx *gin.Context) {
 	})
 }
 
+// transfer
+// @Summary Transfer
+// @Description Method of transferring funds between users
+// @Accept json
+// @Produce json
+// @Param input body models.Transfer true "transfer struct"
+// @Success 200 {object} handler.statusResponse "OK"
+// @Failure 400 {object} handler.errorResponse "invalid request parameters"
+// @Failure 401 {object} handler.errorResponse "the user with the given id does not exist"
+// @Failure 422 {object} handler.errorResponse "insufficient funds to transfer"
+// @Failure 500 {object} handler.errorResponse "server error"
+// @Router /api/v1/transfer [POST]
 func (h *Handler) transfer(ctx *gin.Context) {
 	var input models.Transfer
 	if err := ctx.BindJSON(&input); err != nil {

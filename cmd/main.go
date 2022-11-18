@@ -13,6 +13,13 @@ import (
 	"syscall"
 )
 
+// @title AvitoTestTask
+// @version 1.0
+// @description Microservice for working with user balance
+
+// @host localhost:8000
+// @BasePath /
+
 func main() {
 	if err := InitConfig(); err != nil {
 		logrus.Fatalf("error initializing configs: %s", err.Error())
