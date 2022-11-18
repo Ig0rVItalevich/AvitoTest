@@ -1,6 +1,18 @@
 version: '3.8'
 
 services:
+  avito-test:
+    build: ./
+    command: ./wait-for-postgres.sh db ./avito-test
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    environment:
+      - DB_PASSWORD=qwerty
+    volumes:
+      - ./reports:/go/reports
+
   db:
     restart: always
     image: postgres:latest

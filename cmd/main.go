@@ -6,7 +6,6 @@ import (
 	"github.com/Ig0rVItalevich/avito-test/pkg/handler"
 	"github.com/Ig0rVItalevich/avito-test/pkg/repository"
 	"github.com/Ig0rVItalevich/avito-test/pkg/service"
-	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"os"
@@ -17,10 +16,6 @@ import (
 func main() {
 	if err := InitConfig(); err != nil {
 		logrus.Fatalf("error initializing configs: %s", err.Error())
-	}
-
-	if err := godotenv.Load(); err != nil {
-		logrus.Fatalf("error loading env variables: %s", err.Error())
 	}
 
 	db, err := repository.NewPostgresDB(repository.Config{
