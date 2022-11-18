@@ -6,6 +6,7 @@ import (
 )
 
 type User interface {
+	Exist(id int) (bool, error)
 	Get(id int) (models.User, error)
 	Refill(id int, amount float64) error
 	ExecuteTransfer(transfer models.Transfer) error

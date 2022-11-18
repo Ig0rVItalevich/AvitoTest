@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"github.com/Ig0rVItalevich/avito-test/models"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -19,8 +18,17 @@ func (h *Handler) getReportUser(ctx *gin.Context) {
 	}
 
 	if !input.Validate() {
-		fmt.Println(input)
 		NewErrorResponse(ctx, http.StatusBadRequest, "incorrect parameters")
+		return
+	}
+
+	flag, err := h.services.User.Exist(input.UserId)
+	if err != nil {
+		NewErrorResponse(ctx, http.StatusInternalServerError, err.Error())
+		return
+	}
+	if !flag {
+		NewErrorResponse(ctx, http.StatusUnauthorized, err.Error())
 		return
 	}
 
@@ -40,6 +48,14 @@ type inputRevenueReport struct {
 	Month int `json:"month"`
 }
 
+func (i *inputRevenueReport) Validate() bool {
+	if i.Month < january || i.Month > december || i.Year < yearBottom || i.Year > yearHigh {
+		return false
+	}
+
+	return true
+}
+
 func (h *Handler) getReportRevenue(ctx *gin.Context) {
 	var input inputRevenueReport
 	if err := ctx.BindJSON(&input); err != nil {
@@ -47,7 +63,7 @@ func (h *Handler) getReportRevenue(ctx *gin.Context) {
 		return
 	}
 
-	if input.Month < january || input.Month > december || input.Year < yearBottom || input.Year > yearHigh {
+	if !input.Validate() {
 		NewErrorResponse(ctx, http.StatusBadRequest, "incorrect parameters")
 		return
 	}

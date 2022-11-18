@@ -16,6 +16,20 @@ func NewUserPostgres(db *sqlx.DB) *UserPostgres {
 	return &UserPostgres{db: db}
 }
 
+func (r *UserPostgres) Exist(id int) (bool, error) {
+	query := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE id=$1", usersTable)
+	row := r.db.QueryRow(query, id)
+	var count int
+	if err := row.Scan(&count); err != nil {
+		return false, err
+	}
+	if count == 0 {
+		return false, nil
+	}
+
+	return true, nil
+}
+
 func (r *UserPostgres) Get(id int) (models.User, error) {
 	var user models.User
 	query := fmt.Sprintf("SELECT id, balance FROM %s WHERE id=$1", usersTable)

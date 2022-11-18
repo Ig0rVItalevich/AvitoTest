@@ -6,3 +6,11 @@ type Purchase struct {
 	ProductId int     `json:"product_id"`
 	Amount    float64 `json:"amount"`
 }
+
+func (p *Purchase) Validate() bool {
+	if p.UserId <= 0 || p.OrderId <= 0 || p.ProductId <= 0 || p.Amount <= 0 {
+		return false
+	}
+
+	return true
+}
